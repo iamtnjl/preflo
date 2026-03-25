@@ -1,5 +1,6 @@
 node_modules/
 .turbo/
+*.tsbuildinfo
 __pycache__/
 *.pyc
 .venv/
