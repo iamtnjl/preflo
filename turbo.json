@@ -10,6 +10,10 @@
       "cache": false,
       "persistent": true
     },
+    "db:generate": {
+      "cache": false
+    },
+    "typecheck": {},
     "lint": {},
     "test": {}
   }

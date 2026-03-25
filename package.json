@@ -1,19 +1,43 @@
 {
-  "name": "ife",
+  "name": "preflo",
   "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.18.2",
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
-    "dev:web": "turbo dev --filter=@ife/web",
-    "dev:api": "turbo dev --filter=@ife/api",
+    "dev:web": "turbo dev --filter=@preflo/web",
+    "dev:api": "turbo dev --filter=@preflo/api",
     "workers:start": "cd services/workers && python run_workers.py",
     "workers:test": "cd services/workers && python -m pytest tests/",
-    "db:migrate": "cd apps/api && pnpm run db:migrate",
-    "validate": "cd services/workers && python scripts/validate_scoring.py"
+    "db:generate": "pnpm --filter=@preflo/shared db:generate",
+    "db:migrate": "pnpm --filter=@preflo/shared db:migrate",
+    "db:push": "pnpm --filter=@preflo/shared db:push",
+    "db:studio": "pnpm --filter=@preflo/shared db:studio",
+    "contracts:generate": "pnpm --filter=@preflo/api contracts:extract && pnpm --filter=@preflo/web contracts:types",
+    "contracts:refresh": "pnpm db:generate && pnpm contracts:generate",
+    "contracts:drift-check": "bash scripts/contracts-drift-check.sh",
+    "typecheck": "pnpm contracts:generate && turbo typecheck",
+    "lint": "turbo lint",
+    "check": "pnpm typecheck && pnpm lint && pnpm contracts:drift-check",
+    "validate": "cd services/workers && python scripts/validate_scoring.py",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "globals": "^16.0.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^16.0.0",
     "turbo": "^2.0.0",
     "typescript": "^5.4.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix"
+    ]
   },
   "pnpm": {
     "onlyBuiltDependencies": [

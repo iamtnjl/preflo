@@ -1,18 +1,21 @@
 {
-  "name": "@ife/web",
+  "name": "@preflo/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev --port 3000",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "typecheck": "tsc --noEmit",
+    "lint": "next lint",
+    "contracts:types": "openapi-typescript ../../packages/shared/src/openapi.json -o ./lib/api-types.d.ts"
   },
   "dependencies": {
-    "next": "^15.3.0",
+    "next": "^16.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "@ife/shared": "workspace:*"
+    "openapi-fetch": "^0.14.0",
+    "@preflo/shared": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
@@ -21,6 +24,7 @@
     "typescript": "^5.4.0",
     "tailwindcss": "^4.1.0",
     "@tailwindcss/postcss": "^4.1.0",
-    "postcss": "^8.5.0"
+    "postcss": "^8.5.0",
+    "openapi-typescript": "^7.8.0"
   }
 }

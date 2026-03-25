@@ -1,5 +1,5 @@
 {
-  "name": "@ife/api",
+  "name": "@preflo/api",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -7,18 +7,21 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
-    "lint": "tsc --noEmit",
-    "db:migrate": "echo 'Run migrations manually for now'"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/",
+    "contracts:extract": "tsx src/scripts/generateOpenAPI.ts"
   },
   "dependencies": {
-    "fastify": "^5.3.0",
     "@fastify/cors": "^11.0.0",
     "@fastify/rate-limit": "^10.2.0",
-    "@ife/shared": "workspace:*"
+    "@fastify/swagger": "^9.0.0",
+    "@fastify/swagger-ui": "^5.0.0",
+    "@preflo/shared": "workspace:*",
+    "fastify": "^5.3.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "typescript": "^5.4.0",
-    "tsx": "^4.19.0"
+    "tsx": "^4.19.0",
+    "typescript": "^5.4.0"
   }
 }

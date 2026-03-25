@@ -1,0 +1,165 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums (single source of truth for TS + DB) ───
+
+enum Domain {
+  SEO
+  content
+  ecommerce
+  saas
+  social
+}
+
+enum Difficulty {
+  easy
+  medium
+  hard
+  very_hard
+}
+
+enum Regime {
+  emerging
+  trending
+  stable
+  saturated
+  declining
+}
+
+enum EffortLevel {
+  low
+  medium
+  high
+}
+
+// ─── Models ───
+
+model Keyword {
+  id           Int       @id @default(autoincrement())
+  keyword      String    @unique @db.VarChar(500)
+  slug         String    @unique @db.VarChar(500)
+  domain       Domain?
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  lastAnalyzed DateTime? @map("last_analyzed") @db.Timestamptz
+
+  demandSignals      DemandSignal[]
+  competitionSignals CompetitionSignal[]
+  trendSignals       TrendSignal[]
+  feasibilityScores  FeasibilityScore[]
+  outcomes           Outcome[]
+  seoPages           SeoPage[]
+
+  @@map("keywords")
+}
+
+model DemandSignal {
+  id             Int      @id @default(autoincrement())
+  keywordId      Int      @map("keyword_id")
+  source         String   @db.VarChar(50)
+  postCount      Int?     @map("post_count")
+  avgComments    Float?   @map("avg_comments")
+  sentimentScore Float?   @map("sentiment_score")
+  recencyScore   Float?   @map("recency_score")
+  rawData        Json?    @map("raw_data")
+  collectedAt    DateTime @default(now()) @map("collected_at") @db.Timestamptz
+
+  keyword Keyword @relation(fields: [keywordId], references: [id])
+
+  @@index([keywordId])
+  @@map("demand_signals")
+}
+
+model CompetitionSignal {
+  id                   Int      @id @default(autoincrement())
+  keywordId            Int      @map("keyword_id")
+  topResults           Json?    @map("top_results")
+  avgDomainStrength    Float?   @map("avg_domain_strength")
+  uniqueDomainsTop10   Int?     @map("unique_domains_top10")
+  avgContentLength     Int?     @map("avg_content_length")
+  avgContentAgeDays    Int?     @map("avg_content_age_days")
+  indexedPagesEstimate BigInt?  @map("indexed_pages_estimate")
+  collectedAt          DateTime @default(now()) @map("collected_at") @db.Timestamptz
+
+  keyword Keyword @relation(fields: [keywordId], references: [id])
+
+  @@index([keywordId])
+  @@map("competition_signals")
+}
+
+model TrendSignal {
+  id             Int      @id @default(autoincrement())
+  keywordId      Int      @map("keyword_id")
+  interestData   Json?    @map("interest_data")
+  slope          Float?
+  variance       Float?
+  relatedQueries Json?    @map("related_queries")
+  collectedAt    DateTime @default(now()) @map("collected_at") @db.Timestamptz
+
+  keyword Keyword @relation(fields: [keywordId], references: [id])
+
+  @@index([keywordId])
+  @@map("trend_signals")
+}
+
+model FeasibilityScore {
+  id                 Int        @id @default(autoincrement())
+  keywordId          Int        @map("keyword_id")
+  demandScore        Float      @map("demand_score")
+  competitionScore   Float      @map("competition_score")
+  constraintPressure Float      @map("constraint_pressure")
+  feasibilityScore   Float      @map("feasibility_score")
+  difficulty         Difficulty
+  timeRangeMin       Int?       @map("time_range_min")
+  timeRangeMax       Int?       @map("time_range_max")
+  regime             Regime?
+  successBand        Json?      @map("success_band")
+  constraints        Json?
+  conditions         Json?
+  signalVersions     Json?      @map("signal_versions")
+  scoredAt           DateTime   @default(now()) @map("scored_at") @db.Timestamptz
+
+  keyword  Keyword   @relation(fields: [keywordId], references: [id])
+  outcomes Outcome[]
+
+  @@index([keywordId])
+  @@map("feasibility_scores")
+}
+
+model Outcome {
+  id              Int      @id @default(autoincrement())
+  keywordId       Int      @map("keyword_id")
+  scoreId         Int      @map("score_id")
+  actualResult    String?  @map("actual_result") @db.VarChar(50)
+  monthsElapsed   Int?     @map("months_elapsed")
+  trafficAchieved Int?     @map("traffic_achieved")
+  notes           String?
+  reportedAt      DateTime @default(now()) @map("reported_at") @db.Timestamptz
+
+  keyword Keyword          @relation(fields: [keywordId], references: [id])
+  score   FeasibilityScore @relation(fields: [scoreId], references: [id])
+
+  @@map("outcomes")
+}
+
+model SeoPage {
+  id              Int       @id @default(autoincrement())
+  keywordId       Int       @map("keyword_id")
+  pageType        String?   @map("page_type") @db.VarChar(50)
+  slug            String    @unique @db.VarChar(500)
+  title           String?   @db.VarChar(200)
+  metaDescription String?   @map("meta_description") @db.VarChar(300)
+  lastGenerated   DateTime? @map("last_generated") @db.Timestamptz
+  indexed         Boolean   @default(false)
+
+  keyword Keyword @relation(fields: [keywordId], references: [id])
+
+  @@index([slug])
+  @@map("seo_pages")
+}

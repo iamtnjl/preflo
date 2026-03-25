@@ -1,0 +1,1113 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Preflo API",
+    "description": "Internet Feasibility Engine API",
+    "version": "0.1.0"
+  },
+  "components": {
+    "schemas": {}
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "description": "Health check endpoint",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "ok"
+                      ]
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "timestamp"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analyze": {
+      "post": {
+        "tags": [
+          "Analysis"
+        ],
+        "description": "Submit a niche/keyword for feasibility analysis",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "Search query or niche keyword"
+                  },
+                  "niche": {
+                    "type": "string",
+                    "description": "Niche category"
+                  },
+                  "domain": {
+                    "type": "string",
+                    "enum": [
+                      "SEO",
+                      "content",
+                      "ecommerce",
+                      "saas",
+                      "social"
+                    ]
+                  },
+                  "effort_level": {
+                    "type": "string",
+                    "enum": [
+                      "low",
+                      "medium",
+                      "high"
+                    ]
+                  },
+                  "budget": {
+                    "type": "number",
+                    "description": "Budget in USD"
+                  },
+                  "time_horizon": {
+                    "type": "number",
+                    "description": "Time horizon in months"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "keyword",
+                    "slug",
+                    "domain",
+                    "feasibility_score",
+                    "demand_score",
+                    "competition_score",
+                    "constraint_pressure",
+                    "difficulty",
+                    "time_range_min",
+                    "time_range_max",
+                    "regime",
+                    "success_band",
+                    "constraints",
+                    "conditions",
+                    "scored_at"
+                  ],
+                  "properties": {
+                    "keyword": {
+                      "type": "string"
+                    },
+                    "slug": {
+                      "type": "string"
+                    },
+                    "domain": {
+                      "type": "string",
+                      "enum": [
+                        "SEO",
+                        "content",
+                        "ecommerce",
+                        "saas",
+                        "social"
+                      ]
+                    },
+                    "feasibility_score": {
+                      "type": "number"
+                    },
+                    "demand_score": {
+                      "type": "number"
+                    },
+                    "competition_score": {
+                      "type": "number"
+                    },
+                    "constraint_pressure": {
+                      "type": "number"
+                    },
+                    "difficulty": {
+                      "type": "string",
+                      "enum": [
+                        "easy",
+                        "medium",
+                        "hard",
+                        "very_hard"
+                      ]
+                    },
+                    "time_range_min": {
+                      "type": "number"
+                    },
+                    "time_range_max": {
+                      "type": "number"
+                    },
+                    "regime": {
+                      "type": "string",
+                      "enum": [
+                        "emerging",
+                        "trending",
+                        "stable",
+                        "saturated",
+                        "declining"
+                      ]
+                    },
+                    "success_band": {
+                      "type": "object",
+                      "properties": {
+                        "best_case": {
+                          "type": "number"
+                        },
+                        "expected": {
+                          "type": "number"
+                        },
+                        "worst_case": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "best_case",
+                        "expected",
+                        "worst_case"
+                      ]
+                    },
+                    "constraints": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string"
+                          },
+                          "severity": {
+                            "type": "string",
+                            "enum": [
+                              "high",
+                              "medium",
+                              "low"
+                            ]
+                          },
+                          "category": {
+                            "type": "string",
+                            "enum": [
+                              "hard",
+                              "soft"
+                            ]
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "implication": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "type",
+                          "severity",
+                          "category",
+                          "description",
+                          "implication"
+                        ]
+                      }
+                    },
+                    "conditions": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "scored_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "job_id",
+                    "estimated_wait",
+                    "poll_url"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "processing",
+                        "complete",
+                        "failed"
+                      ]
+                    },
+                    "job_id": {
+                      "type": "string"
+                    },
+                    "estimated_wait": {
+                      "type": "string"
+                    },
+                    "poll_url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "message"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "message"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/result/{slug}": {
+      "get": {
+        "tags": [
+          "Analysis"
+        ],
+        "description": "Get feasibility result by slug",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "slug",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "keyword",
+                    "slug",
+                    "domain",
+                    "feasibility_score",
+                    "demand_score",
+                    "competition_score",
+                    "constraint_pressure",
+                    "difficulty",
+                    "time_range_min",
+                    "time_range_max",
+                    "regime",
+                    "success_band",
+                    "constraints",
+                    "conditions",
+                    "scored_at"
+                  ],
+                  "properties": {
+                    "keyword": {
+                      "type": "string"
+                    },
+                    "slug": {
+                      "type": "string"
+                    },
+                    "domain": {
+                      "type": "string",
+                      "enum": [
+                        "SEO",
+                        "content",
+                        "ecommerce",
+                        "saas",
+                        "social"
+                      ]
+                    },
+                    "feasibility_score": {
+                      "type": "number"
+                    },
+                    "demand_score": {
+                      "type": "number"
+                    },
+                    "competition_score": {
+                      "type": "number"
+                    },
+                    "constraint_pressure": {
+                      "type": "number"
+                    },
+                    "difficulty": {
+                      "type": "string",
+                      "enum": [
+                        "easy",
+                        "medium",
+                        "hard",
+                        "very_hard"
+                      ]
+                    },
+                    "time_range_min": {
+                      "type": "number"
+                    },
+                    "time_range_max": {
+                      "type": "number"
+                    },
+                    "regime": {
+                      "type": "string",
+                      "enum": [
+                        "emerging",
+                        "trending",
+                        "stable",
+                        "saturated",
+                        "declining"
+                      ]
+                    },
+                    "success_band": {
+                      "type": "object",
+                      "properties": {
+                        "best_case": {
+                          "type": "number"
+                        },
+                        "expected": {
+                          "type": "number"
+                        },
+                        "worst_case": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "best_case",
+                        "expected",
+                        "worst_case"
+                      ]
+                    },
+                    "constraints": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string"
+                          },
+                          "severity": {
+                            "type": "string",
+                            "enum": [
+                              "high",
+                              "medium",
+                              "low"
+                            ]
+                          },
+                          "category": {
+                            "type": "string",
+                            "enum": [
+                              "hard",
+                              "soft"
+                            ]
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "implication": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "type",
+                          "severity",
+                          "category",
+                          "description",
+                          "implication"
+                        ]
+                      }
+                    },
+                    "conditions": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "scored_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "message"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "message"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/compare": {
+      "get": {
+        "tags": [
+          "Analysis"
+        ],
+        "description": "Compare feasibility of multiple niches",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "slugs",
+            "required": true,
+            "description": "Comma-separated list of keyword slugs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "keyword",
+                          "slug",
+                          "domain",
+                          "feasibility_score",
+                          "demand_score",
+                          "competition_score",
+                          "constraint_pressure",
+                          "difficulty",
+                          "time_range_min",
+                          "time_range_max",
+                          "regime",
+                          "success_band",
+                          "constraints",
+                          "conditions",
+                          "scored_at"
+                        ],
+                        "properties": {
+                          "keyword": {
+                            "type": "string"
+                          },
+                          "slug": {
+                            "type": "string"
+                          },
+                          "domain": {
+                            "type": "string",
+                            "enum": [
+                              "SEO",
+                              "content",
+                              "ecommerce",
+                              "saas",
+                              "social"
+                            ]
+                          },
+                          "feasibility_score": {
+                            "type": "number"
+                          },
+                          "demand_score": {
+                            "type": "number"
+                          },
+                          "competition_score": {
+                            "type": "number"
+                          },
+                          "constraint_pressure": {
+                            "type": "number"
+                          },
+                          "difficulty": {
+                            "type": "string",
+                            "enum": [
+                              "easy",
+                              "medium",
+                              "hard",
+                              "very_hard"
+                            ]
+                          },
+                          "time_range_min": {
+                            "type": "number"
+                          },
+                          "time_range_max": {
+                            "type": "number"
+                          },
+                          "regime": {
+                            "type": "string",
+                            "enum": [
+                              "emerging",
+                              "trending",
+                              "stable",
+                              "saturated",
+                              "declining"
+                            ]
+                          },
+                          "success_band": {
+                            "type": "object",
+                            "properties": {
+                              "best_case": {
+                                "type": "number"
+                              },
+                              "expected": {
+                                "type": "number"
+                              },
+                              "worst_case": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "best_case",
+                              "expected",
+                              "worst_case"
+                            ]
+                          },
+                          "constraints": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string"
+                                },
+                                "severity": {
+                                  "type": "string",
+                                  "enum": [
+                                    "high",
+                                    "medium",
+                                    "low"
+                                  ]
+                                },
+                                "category": {
+                                  "type": "string",
+                                  "enum": [
+                                    "hard",
+                                    "soft"
+                                  ]
+                                },
+                                "description": {
+                                  "type": "string"
+                                },
+                                "implication": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "severity",
+                                "category",
+                                "description",
+                                "implication"
+                              ]
+                            }
+                          },
+                          "conditions": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "scored_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "results"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "message"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "message"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/niches": {
+      "get": {
+        "tags": [
+          "Niches"
+        ],
+        "description": "List recently analyzed niches",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "SEO",
+                "content",
+                "ecommerce",
+                "saas",
+                "social"
+              ]
+            },
+            "in": "query",
+            "name": "domain",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            },
+            "in": "query",
+            "name": "offset",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "niches": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "keyword": {
+                            "type": "string"
+                          },
+                          "slug": {
+                            "type": "string"
+                          },
+                          "domain": {
+                            "type": "string"
+                          },
+                          "feasibility_score": {
+                            "type": "number"
+                          },
+                          "difficulty": {
+                            "type": "string"
+                          },
+                          "scored_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "niches",
+                    "total"
+                  ]
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "message"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/feedback": {
+      "post": {
+        "tags": [
+          "Feedback"
+        ],
+        "description": "Submit outcome feedback for a scored keyword",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "keyword_slug",
+                  "actual_result"
+                ],
+                "properties": {
+                  "keyword_slug": {
+                    "type": "string"
+                  },
+                  "actual_result": {
+                    "type": "string"
+                  },
+                  "months_elapsed": {
+                    "type": "integer"
+                  },
+                  "traffic_achieved": {
+                    "type": "integer"
+                  },
+                  "notes": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "outcome_id": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "message",
+                    "outcome_id"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "message"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "message"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "message"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/export/{slug}": {
+      "get": {
+        "tags": [
+          "Export"
+        ],
+        "description": "Export feasibility report as JSON",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "csv"
+              ],
+              "default": "json"
+            },
+            "in": "query",
+            "name": "format",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "slug",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Exported report data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Exported report data"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "message"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error",
+                    "message"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001",
+      "description": "Local dev"
+    }
+  ]
+}
