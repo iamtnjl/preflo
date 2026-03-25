@@ -1,0 +1,16 @@
+{
+  "name": "ife",
+  "private": true,
+  "workspaces": ["apps/web", "apps/api", "packages/*"],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "dev:web": "cd apps/web && npm run dev",
+    "dev:api": "cd apps/api && npm run dev",
+    "workers:start": "cd services/workers && python run_workers.py",
+    "workers:test": "cd services/workers && python -m pytest tests/",
+    "db:migrate": "cd apps/api && npm run db:migrate",
+    "validate": "cd services/workers && python scripts/validate_scoring.py"
+  },
+  "devDependencies": { "turbo": "^2.0.0", "typescript": "^5.4.0" }
+}

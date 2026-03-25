@@ -1,0 +1,13 @@
+CREATE TABLE keywords (id SERIAL PRIMARY KEY, keyword VARCHAR(500) NOT NULL UNIQUE, slug VARCHAR(500) NOT NULL UNIQUE, domain VARCHAR(50), created_at TIMESTAMPTZ DEFAULT NOW(), last_analyzed TIMESTAMPTZ);
+CREATE INDEX idx_keywords_slug ON keywords(slug);
+CREATE TABLE demand_signals (id SERIAL PRIMARY KEY, keyword_id INTEGER REFERENCES keywords(id), source VARCHAR(50) NOT NULL, post_count INTEGER, avg_comments FLOAT, sentiment_score FLOAT, recency_score FLOAT, raw_data JSONB, collected_at TIMESTAMPTZ DEFAULT NOW());
+CREATE INDEX idx_demand_keyword ON demand_signals(keyword_id);
+CREATE TABLE competition_signals (id SERIAL PRIMARY KEY, keyword_id INTEGER REFERENCES keywords(id), top_results JSONB, avg_domain_strength FLOAT, unique_domains_top10 INTEGER, avg_content_length INTEGER, avg_content_age_days INTEGER, indexed_pages_estimate BIGINT, collected_at TIMESTAMPTZ DEFAULT NOW());
+CREATE INDEX idx_competition_keyword ON competition_signals(keyword_id);
+CREATE TABLE trend_signals (id SERIAL PRIMARY KEY, keyword_id INTEGER REFERENCES keywords(id), interest_data JSONB, slope FLOAT, variance FLOAT, related_queries JSONB, collected_at TIMESTAMPTZ DEFAULT NOW());
+CREATE INDEX idx_trend_keyword ON trend_signals(keyword_id);
+CREATE TABLE feasibility_scores (id SERIAL PRIMARY KEY, keyword_id INTEGER REFERENCES keywords(id), demand_score FLOAT NOT NULL, competition_score FLOAT NOT NULL, constraint_pressure FLOAT NOT NULL, feasibility_score FLOAT NOT NULL, difficulty VARCHAR(20) NOT NULL, time_range_min INTEGER, time_range_max INTEGER, regime VARCHAR(30), success_band JSONB, constraints JSONB, conditions JSONB, signal_versions JSONB, scored_at TIMESTAMPTZ DEFAULT NOW());
+CREATE INDEX idx_feasibility_keyword ON feasibility_scores(keyword_id);
+CREATE TABLE outcomes (id SERIAL PRIMARY KEY, keyword_id INTEGER REFERENCES keywords(id), score_id INTEGER REFERENCES feasibility_scores(id), actual_result VARCHAR(50), months_elapsed INTEGER, traffic_achieved INTEGER, notes TEXT, reported_at TIMESTAMPTZ DEFAULT NOW());
+CREATE TABLE seo_pages (id SERIAL PRIMARY KEY, keyword_id INTEGER REFERENCES keywords(id), page_type VARCHAR(50), slug VARCHAR(500) NOT NULL UNIQUE, title VARCHAR(200), meta_description VARCHAR(300), last_generated TIMESTAMPTZ, indexed BOOLEAN DEFAULT FALSE);
+CREATE INDEX idx_seo_pages_slug ON seo_pages(slug);
