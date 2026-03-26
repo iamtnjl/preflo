@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Bash(python -m json.tool)",
+      "Bash(curl -sv -X GET \"http://localhost:3001/api/compare?slugs=ai-tools,fitness-blog\")"
+    ]
+  }
+}

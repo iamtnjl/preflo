@@ -1,15 +1,50 @@
 export const analyzeRequestSchema = {
   type: "object",
   properties: {
-    query: { type: "string", description: "Search query or niche keyword" },
-    niche: { type: "string", description: "Niche category" },
+    query: { type: "string", description: "Free-text query (natural language input)" },
+    niche: { type: "string", description: "Niche/topic keyword (structured input)" },
     domain: {
       type: "string",
       enum: ["SEO", "content", "ecommerce", "saas", "social"],
     },
     effort_level: { type: "string", enum: ["low", "medium", "high"] },
-    budget: { type: "number", description: "Budget in USD" },
-    time_horizon: { type: "number", description: "Time horizon in months" },
+    budget: { type: "number", minimum: 0, description: "Budget in USD/month" },
+    time_horizon: {
+      type: "number",
+      minimum: 1,
+      maximum: 36,
+      description: "Time horizon in months",
+    },
+    content_frequency: {
+      type: "string",
+      enum: ["daily", "weekly", "biweekly", "monthly"],
+    },
+  },
+} as const;
+
+const analysisParamsSchema = {
+  type: "object",
+  required: ["domain", "niche", "effort_level", "budget", "time_horizon", "content_frequency"],
+  properties: {
+    domain: { type: "string", enum: ["SEO", "content", "ecommerce", "saas", "social"] },
+    niche: { type: "string" },
+    effort_level: { type: "string", enum: ["low", "medium", "high"] },
+    budget: { type: "number" },
+    time_horizon: { type: "number" },
+    content_frequency: { type: "string", enum: ["daily", "weekly", "biweekly", "monthly"] },
+  },
+} as const;
+
+export const intentResultSchema = {
+  type: "object",
+  required: ["params", "parsed_from", "confidence", "needs_clarification"],
+  properties: {
+    params: analysisParamsSchema,
+    parsed_from: { type: "string", enum: ["natural_language", "structured_form"] },
+    confidence: { type: "number" },
+    raw_query: { type: "string" },
+    needs_clarification: { type: "boolean" },
+    clarification_prompt: { type: "string" },
   },
 } as const;
 

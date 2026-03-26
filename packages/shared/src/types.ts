@@ -12,9 +12,33 @@ export type {
   SeoPage,
 } from "./generated/prisma";
 
-// ─── API request/response types (built on top of Prisma enums) ───
+// ─── Intent Interpretation Engine types ───
 
 import type { Domain, Difficulty, Regime, EffortLevel } from "./generated/prisma";
+
+export type ContentFrequency = "daily" | "weekly" | "biweekly" | "monthly";
+
+/** Standardized parameters produced by intent parsing */
+export interface AnalysisParams {
+  domain: Domain;
+  niche: string;
+  effort_level: EffortLevel;
+  budget: number;
+  time_horizon: number;
+  content_frequency: ContentFrequency;
+}
+
+/** Result of intent interpretation — returned to frontend for confirmation */
+export interface IntentResult {
+  params: AnalysisParams;
+  parsed_from: "natural_language" | "structured_form";
+  confidence: number;
+  raw_query?: string;
+  needs_clarification: boolean;
+  clarification_prompt?: string;
+}
+
+// ─── API request/response types (built on top of Prisma enums) ───
 
 export interface AnalyzeRequest {
   query?: string;
@@ -23,6 +47,7 @@ export interface AnalyzeRequest {
   effort_level?: EffortLevel;
   budget?: number;
   time_horizon?: number;
+  content_frequency?: ContentFrequency;
 }
 
 export interface FeasibilityReport {
@@ -40,6 +65,8 @@ export interface FeasibilityReport {
   success_band: SuccessBand;
   constraints: Constraint[];
   conditions: string[];
+  failure_modes: FailureMode[];
+  concrete_requirements: ConcreteRequirement[];
   scored_at: string;
 }
 
@@ -57,9 +84,74 @@ export interface Constraint {
   implication: string;
 }
 
+export interface FailureMode {
+  mode: string;
+  probability: number;
+  severity: "high" | "medium" | "low";
+  description: string;
+  mitigation: string[];
+}
+
+export interface ConcreteRequirement {
+  area: string;
+  target: string;
+  rationale: string;
+}
+
 export interface ProcessingStatus {
   status: "processing" | "complete" | "failed";
   job_id: string;
   estimated_wait: string;
   poll_url: string;
+}
+
+// ─── Scenario Comparison types ───
+
+export interface CompareRequest {
+  scenarios: CompareScenarioInput[];
+}
+
+export interface CompareScenarioInput {
+  label: string;
+  niche: string;
+  domain?: Domain;
+  effort_level?: EffortLevel;
+  budget?: number;
+  time_horizon?: number;
+}
+
+export interface ComparisonTableRow {
+  index: number;
+  label: string;
+  feasibility_score: number;
+  difficulty: string;
+  demand_score: number;
+  competition_score: number;
+  constraint_pressure: number;
+  regime: string;
+  regime_adjustment: number;
+  time_range: string;
+  success_band: SuccessBand;
+  top_constraints: string[];
+  conditions_count: number;
+  composite_rank: number;
+}
+
+export interface CompareRecommendation {
+  recommended_index: number | null;
+  explanation: string;
+}
+
+export interface CompareTradeoff {
+  index: number;
+  label: string;
+  advantages_over_recommended: string[];
+}
+
+export interface CompareResponse {
+  scenario_count: number;
+  tier: string;
+  comparison_table: ComparisonTableRow[];
+  recommendation: CompareRecommendation;
+  tradeoffs: CompareTradeoff[];
 }
