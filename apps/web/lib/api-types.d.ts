@@ -54,7 +54,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Submit a niche/keyword for feasibility analysis */
+        /** @description Parse user input into standardized analysis parameters. */
         post: {
             parameters: {
                 query?: never;
@@ -65,18 +65,20 @@ export interface paths {
             requestBody: {
                 content: {
                     "application/json": {
-                        /** @description Search query or niche keyword */
+                        /** @description Free-text query (natural language input) */
                         query?: string;
-                        /** @description Niche category */
+                        /** @description Niche/topic keyword (structured input) */
                         niche?: string;
                         /** @enum {string} */
                         domain?: "SEO" | "content" | "ecommerce" | "saas" | "social";
                         /** @enum {string} */
                         effort_level?: "low" | "medium" | "high";
-                        /** @description Budget in USD */
+                        /** @description Budget in USD/month */
                         budget?: number;
                         /** @description Time horizon in months */
                         time_horizon?: number;
+                        /** @enum {string} */
+                        content_frequency?: "daily" | "weekly" | "biweekly" | "monthly";
                     };
                 };
             };
@@ -88,69 +90,28 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            keyword: string;
-                            slug: string;
-                            /** @enum {string} */
-                            domain: "SEO" | "content" | "ecommerce" | "saas" | "social";
-                            feasibility_score: number;
-                            demand_score: number;
-                            competition_score: number;
-                            constraint_pressure: number;
-                            /** @enum {string} */
-                            difficulty: "easy" | "medium" | "hard" | "very_hard";
-                            time_range_min: number;
-                            time_range_max: number;
-                            /** @enum {string} */
-                            regime: "emerging" | "trending" | "stable" | "saturated" | "declining";
-                            success_band: {
-                                best_case: number;
-                                expected: number;
-                                worst_case: number;
+                            params: {
+                                /** @enum {string} */
+                                domain: "SEO" | "content" | "ecommerce" | "saas" | "social";
+                                niche: string;
+                                /** @enum {string} */
+                                effort_level: "low" | "medium" | "high";
+                                budget: number;
+                                time_horizon: number;
+                                /** @enum {string} */
+                                content_frequency: "daily" | "weekly" | "biweekly" | "monthly";
                             };
-                            constraints: {
-                                type: string;
-                                /** @enum {string} */
-                                severity: "high" | "medium" | "low";
-                                /** @enum {string} */
-                                category: "hard" | "soft";
-                                description: string;
-                                implication: string;
-                            }[];
-                            conditions: string[];
-                            /** Format: date-time */
-                            scored_at: string;
-                        };
-                    };
-                };
-                /** @description Default Response */
-                202: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
                             /** @enum {string} */
-                            status: "processing" | "complete" | "failed";
-                            job_id: string;
-                            estimated_wait: string;
-                            poll_url: string;
+                            parsed_from: "natural_language" | "structured_form";
+                            confidence: number;
+                            raw_query?: string;
+                            needs_clarification: boolean;
+                            clarification_prompt?: string;
                         };
                     };
                 };
                 /** @description Default Response */
                 400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
-                    };
-                };
-                /** @description Default Response */
-                501: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -169,14 +130,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/result/{slug}": {
+    "/api/analyze/run": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** @description Get feasibility result by slug */
+        get?: never;
+        put?: never;
+        /** @description Submit confirmed parameters to the worker for full analysis pipeline. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        niche: string;
+                        /** @enum {string} */
+                        domain: "SEO" | "content" | "ecommerce" | "saas" | "social";
+                        /** @enum {string} */
+                        effort_level?: "low" | "medium" | "high";
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/analyze/status/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Check if a keyword has been fully scored. */
         get: {
             parameters: {
                 query?: never;
@@ -193,56 +198,39 @@ export interface paths {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json": {
-                            keyword: string;
-                            slug: string;
-                            /** @enum {string} */
-                            domain: "SEO" | "content" | "ecommerce" | "saas" | "social";
-                            feasibility_score: number;
-                            demand_score: number;
-                            competition_score: number;
-                            constraint_pressure: number;
-                            /** @enum {string} */
-                            difficulty: "easy" | "medium" | "hard" | "very_hard";
-                            time_range_min: number;
-                            time_range_max: number;
-                            /** @enum {string} */
-                            regime: "emerging" | "trending" | "stable" | "saturated" | "declining";
-                            success_band: {
-                                best_case: number;
-                                expected: number;
-                                worst_case: number;
-                            };
-                            constraints: {
-                                type: string;
-                                /** @enum {string} */
-                                severity: "high" | "medium" | "low";
-                                /** @enum {string} */
-                                category: "hard" | "soft";
-                                description: string;
-                                implication: string;
-                            }[];
-                            conditions: string[];
-                            /** Format: date-time */
-                            scored_at: string;
-                        };
-                    };
+                    content?: never;
                 };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/result/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Get full feasibility report by keyword slug */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    slug: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
                 /** @description Default Response */
                 404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
-                    };
-                };
-                /** @description Default Response */
-                501: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -270,11 +258,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Compare feasibility of multiple niches */
+        /** @description Compare feasibility of multiple already-scored keywords by slug */
         get: {
             parameters: {
                 query: {
-                    /** @description Comma-separated list of keyword slugs */
+                    /** @description Comma-separated list of keyword slugs (2-5) */
                     slugs: string;
                 };
                 header?: never;
@@ -290,38 +278,36 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            results: {
-                                keyword: string;
-                                slug: string;
-                                /** @enum {string} */
-                                domain: "SEO" | "content" | "ecommerce" | "saas" | "social";
-                                feasibility_score: number;
-                                demand_score: number;
-                                competition_score: number;
-                                constraint_pressure: number;
-                                /** @enum {string} */
-                                difficulty: "easy" | "medium" | "hard" | "very_hard";
-                                time_range_min: number;
-                                time_range_max: number;
-                                /** @enum {string} */
-                                regime: "emerging" | "trending" | "stable" | "saturated" | "declining";
-                                success_band: {
-                                    best_case: number;
-                                    expected: number;
-                                    worst_case: number;
+                            scenario_count: number;
+                            tier: string;
+                            comparison_table: {
+                                index?: number;
+                                label?: string;
+                                feasibility_score?: number;
+                                difficulty?: string;
+                                demand_score?: number;
+                                competition_score?: number;
+                                constraint_pressure?: number;
+                                regime?: string;
+                                regime_adjustment?: number;
+                                time_range?: string;
+                                success_band?: {
+                                    best_case?: number;
+                                    expected?: number;
+                                    worst_case?: number;
                                 };
-                                constraints: {
-                                    type: string;
-                                    /** @enum {string} */
-                                    severity: "high" | "medium" | "low";
-                                    /** @enum {string} */
-                                    category: "hard" | "soft";
-                                    description: string;
-                                    implication: string;
-                                }[];
-                                conditions: string[];
-                                /** Format: date-time */
-                                scored_at: string;
+                                top_constraints?: string[];
+                                conditions_count?: number;
+                                composite_rank?: number;
+                            }[];
+                            recommendation: {
+                                recommended_index?: null | number;
+                                explanation?: string;
+                            };
+                            tradeoffs: {
+                                index?: number;
+                                label?: string;
+                                advantages_over_recommended?: string[];
                             }[];
                         };
                     };
@@ -338,8 +324,77 @@ export interface paths {
                         };
                     };
                 };
+            };
+        };
+        put?: never;
+        /** @description Compare multiple hypothetical scenarios side-by-side */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        scenarios: {
+                            label: string;
+                            niche: string;
+                            /** @enum {string} */
+                            domain?: "SEO" | "content" | "ecommerce" | "saas" | "social";
+                            /** @enum {string} */
+                            effort_level?: "low" | "medium" | "high";
+                            budget?: number;
+                            time_horizon?: number;
+                        }[];
+                    };
+                };
+            };
+            responses: {
                 /** @description Default Response */
-                501: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            scenario_count: number;
+                            tier: string;
+                            comparison_table: {
+                                index?: number;
+                                label?: string;
+                                feasibility_score?: number;
+                                difficulty?: string;
+                                demand_score?: number;
+                                competition_score?: number;
+                                constraint_pressure?: number;
+                                regime?: string;
+                                regime_adjustment?: number;
+                                time_range?: string;
+                                success_band?: {
+                                    best_case?: number;
+                                    expected?: number;
+                                    worst_case?: number;
+                                };
+                                top_constraints?: string[];
+                                conditions_count?: number;
+                                composite_rank?: number;
+                            }[];
+                            recommendation: {
+                                recommended_index?: null | number;
+                                explanation?: string;
+                            };
+                            tradeoffs: {
+                                index?: number;
+                                label?: string;
+                                advantages_over_recommended?: string[];
+                            }[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                400: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -352,8 +407,6 @@ export interface paths {
                 };
             };
         };
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
